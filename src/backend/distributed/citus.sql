@@ -16,6 +16,20 @@ END;
 $$;
 
 /*****************************************************************************
+ * Enable SSL to encrypt all trafic by default
+ *****************************************************************************/
+-- create temporary UDF that has the power to change settings within postgres and drop it
+-- after ssl has been setup.
+CREATE FUNCTION citus_setup_ssl()
+    RETURNS void
+    LANGUAGE C STRICT
+    AS 'MODULE_PATHNAME', $$citus_setup_ssl$$;
+
+SELECT citus_setup_ssl();
+
+DROP FUNCTION citus_setup_ssl();
+
+/*****************************************************************************
  * Citus data types
  *****************************************************************************/
 CREATE TYPE citus.distribution_type AS ENUM (

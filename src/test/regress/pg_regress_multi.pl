@@ -318,6 +318,13 @@ if ($useMitmproxy)
   # make tests reproducible by never trying to negotiate ssl
   push(@pgOptions, '-c', "citus.node_conninfo=sslmode=disable");
 }
+elsif ($majorversion == '9.6' || $followercluster)
+{
+  # pg9.6 requires a restart to turnon ssl, as that is hard in the test suite we fall back
+  # to the old behaviour of sslmode=prefer, this will not turn on ssl during extensions
+  # creation
+  push(@pgOptions, '-c', "citus.node_conninfo=sslmode=prefer");
+}
 
 if ($useMitmproxy)
 {
@@ -356,6 +363,8 @@ for my $option (@userPgOptions)
 {
 	push(@pgOptions, '-c', $option);
 }
+
+print('major version', $majorversion);
 
 #define data types as a name->definition
 %dataTypes = ('dummy_type', '(i integer)',
@@ -626,7 +635,7 @@ END
     # At the end of a run, replace redirected binary with original again
     if ($valgrind)
     {
-	revert_replace_postgres();
+        revert_replace_postgres();
     }
 }
 
@@ -702,7 +711,7 @@ if ($followercluster)
         {
           system("tail", ("-n20", catfile("tmp_check", "follower.$port", "log", "postmaster.log")));
           die "Could not start follower server";
-	}
+        }
     }
 }
 
