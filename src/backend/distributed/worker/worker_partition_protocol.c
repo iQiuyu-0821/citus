@@ -643,7 +643,7 @@ CacheDirectoryElement(const char *filename)
 	appendStringInfo(directoryPath, "base/%s/", PG_JOB_CACHE_DIR);
 
 	directoryPathFound = strstr(filename, directoryPath->data);
-	if (directoryPathFound != NULL)
+	if (directoryPathFound == filename)
 	{
 		directoryElement = true;
 	}
